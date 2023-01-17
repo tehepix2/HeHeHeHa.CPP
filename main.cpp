@@ -2,7 +2,7 @@
 
 // runs once at the beginning
 WASM_EXPORT void setup() {
-
+    setTitle("Lmao");
 }
 
 // runs every frame update

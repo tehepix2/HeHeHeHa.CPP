@@ -6,6 +6,18 @@ const canvas = document.createElement("canvas", {
 document.body.appendChild(canvas);
 const ctx = canvas.getContext("2d");
 
+// memory array
+let memoryBuffer;
+
+// gets null-terminated string from memory buffer
+function getStr(ptr) {
+    let str = "";
+    for (let i=0; memoryBuffer[i]!=0; i++) {
+        str += memoryBuffer[i];
+    }
+    return str;
+}
+
 // convert number to string
 function str(num) {
     return num.toString();
@@ -13,7 +25,7 @@ function str(num) {
 
 // print given text to the console
 function log(text) {
-    console.log(text);
+    console.log(getStr(text));
 }
 
 // set canvas size
@@ -24,7 +36,7 @@ function setCanvasSize(width, height) {
 
 // set page title
 function setTitle(title) {
-    document.getElementByTagName("title").innerText = title;
+    document.getElementById("title").innerText = getStr(title);
 }
 
 // IMAGE FUNCTIONS
@@ -42,6 +54,7 @@ function loadImage(uri) {
         document.head.appendChild(img);
     });
     images += img;
+    return images.length - 1;
 }
 
 // renders image at coordinates
@@ -69,10 +82,19 @@ let imports = {
 WebAssembly.instantiateStreaming(fetch("main.wasm"), imports).then(
     (obj) => {
         // unpack imports here
-        const { fib } = obj.instance.exports;
+        const { memory, setup, update } = obj.instance.exports;
         console.log(obj.instance.exports);
 
-        // use imports here
-        fib(10);
+        memoryBuffer = new Uint32Array(memory.buffer);
+        log(memoryBuffer);
+
+        // sets up the game
+        setup();
+        // starts the game loop
+        const gameLoop = (dt) => {
+            update(dt);
+            requestAnimationFrame(gameLoop);
+        };
+        gameLoop(0);
     }
 );
