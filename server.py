@@ -48,4 +48,4 @@ def get_resource(resourceName:str) -> str:
 
 # gets C++ code
 cpp = readFile("main.cpp")
-app.run(host="127.0.0.1:8080")
+app.run(host="127.0.0.1", port=8080)

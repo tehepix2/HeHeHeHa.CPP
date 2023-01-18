@@ -6,7 +6,7 @@ extern "C" {
     void log(char* text);
 
     void setCanvasSize(int width, int height);
-    void setTitle(char* title);
+    void setTitle(const char* title);
 
     int loadImage(char* uri);
     void drawImage(int id, int x, int y);

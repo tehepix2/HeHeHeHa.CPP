@@ -7,15 +7,13 @@ document.body.appendChild(canvas);
 const ctx = canvas.getContext("2d");
 
 // memory array
-let memoryBuffer;
+let memoryGlobal;
 
 // gets null-terminated string from memory buffer
 function getStr(ptr) {
-    let str = "";
-    for (let i=0; memoryBuffer[i]!=0; i++) {
-        str += memoryBuffer[i];
-    }
-    return str;
+    let len = ptr - (new Uint8Array(memoryGlobal.buffer).findIndex(item => item === 0));
+    let arr = new Uint8Array(memoryGlobal.buffer, ptr, len);
+    return new TextDecoder().decode(arr);
 }
 
 // convert number to string
@@ -85,8 +83,8 @@ WebAssembly.instantiateStreaming(fetch("main.wasm"), imports).then(
         const { memory, setup, update } = obj.instance.exports;
         console.log(obj.instance.exports);
 
-        memoryBuffer = new Uint32Array(memory.buffer);
-        log(memoryBuffer);
+        memoryGlobal = memory;
+        log(memoryGlobal);
 
         // sets up the game
         setup();
